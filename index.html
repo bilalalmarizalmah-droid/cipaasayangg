@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruang Tenang & Penguat Hati</title>
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-warm: #FFF5F6;
+            --pink-soft: #FFE5EC;
+            --pink-medium: #F7CAD0;
+            --pink-accent: #FF758F;
+            --pink-deep: #C9184A;
+            --rosewood: #6D2E46;
+            --amber-warm: #FFB703;
+            --text-dark: #4A2834;
+            --card-shadow: 0 12px 32px rgba(201, 24, 74, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-warm);
+            color: var(--text-dark);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Particle Canvas Background */
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Splash Screen Animasi Pembuka */
+        #splashScreen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #FFF5F6 0%, #FFE5EC 50%, #F7CAD0 100%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            transition: opacity 0.8s ease, visibility 0.8s ease, transform 0.8s ease;
+        }
+
+        #splashScreen.fade-out {
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(1.05);
+        }
+
+        .splash-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            animation: heartPulse 2s infinite ease-in-out;
+        }
+
+        .splash-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 2.5rem;
+            color: var(--pink-deep);
+            margin-bottom: 1rem;
+        }
+
+        .splash-subtitle {
+            font-size: 1.15rem;
+            color: var(--rosewood);
+            max-width: 500px;
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
+        }
+
+        .btn-enter {
+            background: linear-gradient(135deg, var(--pink-accent), var(--pink-deep));
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(201, 24, 74, 0.3);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .btn-enter:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 12px 30px rgba(201, 24, 74, 0.45);
+        }
+
+        /* Header Navigasi Glassmorphism */
+        header {
+            position: sticky;
+            top: 15px;
+            z-index: 1000;
+            padding: 0 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto 2rem auto;
+        }
+
+        .nav-container {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 50px;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 10px 30px rgba(201, 24, 74, 0.08);
+        }
+
+        .brand {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.3rem;
+            color: var(--pink-deep);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--rosewood);
+            font-weight: 700;
+            padding: 0.6rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background: var(--pink-deep);
+            color: white;
+            box-shadow: 0 4px 15px rgba(201, 24, 74, 0.25);
+        }
+
+        /* Audio Player Widget */
+        .audio-player-widget {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--pink-soft);
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
+            border: 1px solid var(--pink-medium);
+        }
+
+        .play-btn {
+            background: var(--pink-deep);
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Main Container */
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1.5rem 5rem 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        section {
+            margin-bottom: 4rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .section-header h2 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 2.2rem;
+            color: var(--pink-deep);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            color: var(--rosewood);
+            font-size: 1.05rem;
+        }
+
+        /* Galeri Foto (2 Foto) */
+        .photo-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .photo-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            border: 2px solid var(--pink-soft);
+            transition: transform 0.3s ease;
+        }
+
+        .photo-card:hover {
+            transform: translateY(-8px);
+        }
+
+        .photo-wrapper {
+            position: relative;
+            height: 280px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .photo-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .photo-card:hover img {
+            transform: scale(1.08);
+        }
+
+        .photo-caption {
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .photo-caption h3 {
+            color: var(--pink-deep);
+            font-family: 'Fredoka', sans-serif;
+            margin-bottom: 0.5rem;
+        }
+
+        .photo-caption p {
+            color: var(--rosewood);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Seksi 10 Kartu Afirmasi / Apresiasi */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .flip-card {
+            background-color: transparent;
+            height: 300px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+        }
+
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 24px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--card-shadow);
+        }
+
+        /* Sampul Depan Kartu dengan Emot Imut & Warm Pink */
+        .flip-card-front {
+            background: linear-gradient(135deg, #FFFFFF 0%, var(--pink-soft) 100%);
+            border: 3px solid var(--pink-medium);
+        }
+
+        .card-emo-wrapper {
+            font-size: 3.8rem;
+            margin-bottom: 1rem;
+            animation: playfulFloat 3s infinite ease-in-out;
+        }
+
+        .card-front-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2rem;
+            color: var(--pink-deep);
+            margin-bottom: 0.8rem;
+        }
+
+        .card-badge {
+            background: var(--pink-accent);
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(255, 117, 143, 0.4);
+        }
+
+        /* Bagian Belakang Kartu (Pesan Afirmasi) */
+        .flip-card-back {
+            background: linear-gradient(135deg, var(--pink-deep) 0%, var(--rosewood) 100%);
+            color: white;
+            transform: rotateY(180deg);
+            border: 3px solid var(--pink-accent);
+        }
+
+        .back-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.1rem;
+            color: var(--amber-warm);
+            margin-bottom: 0.8rem;
+        }
+
+        .back-text {
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Ruang Curhat */
+        .journal-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+            border: 2px solid var(--pink-soft);
+        }
+
+        .journal-textarea {
+            width: 100%;
+            height: 150px;
+            border: 2px solid var(--pink-soft);
+            border-radius: 16px;
+            padding: 1rem;
+            font-size: 1rem;
+            color: var(--text-dark);
+            outline: none;
+            resize: vertical;
+            transition: border-color 0.3s;
+            margin-bottom: 1rem;
+        }
+
+        .journal-textarea:focus {
+            border-color: var(--pink-accent);
+        }
+
+        .btn-save {
+            background: var(--pink-deep);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.8rem;
+            border-radius: 30px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-save:hover {
+            background: var(--rosewood);
+        }
+
+        /* Animations */
+        @keyframes heartPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        @keyframes playfulFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(4deg); }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .splash-title { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Canvas Partikel Warm Melayang -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- 1. Animasi Pembuka (Splash Screen) -->
+    <div id="splashScreen">
+        <div class="splash-icon">🧸💖</div>
+        <h1 class="splash-title">Ruang Tenang & Penguat Hati</h1>
+        <p class="splash-subtitle">Bernapaslah sejenak... Di saat ada badai atau masalah dengan keluarga, ingatlah bahwa perasaanmu valid dan kamu sangat berharga.</p>
+        <button class="btn-enter" onclick="enterApp()">
+            <i class="fa-solid fa-heart"></i> Masuk Pelukan Warm Pink
+        </button>
+    </div>
+
+    <!-- 2. Header & Navigasi -->
+    <header>
+        <div class="nav-container">
+            <a href="#" class="brand">
+                <i class="fa-solid fa-heart-pulse"></i> Ruang Tenang
+            </a>
+            <ul class="nav-links">
+                <li><a href="#galeri" class="active">Galeri</a></li>
+                <li><a href="#afirmasi">10 Kartu Pelukan</a></li>
+                <li><a href="#curhat">Ruang Curhat</a></li>
+            </ul>
+            <!-- Music Player -->
+            <div class="audio-player-widget">
+                <button class="play-btn" id="playBtn" onclick="toggleAudio()">
+                    <i class="fa-solid fa-play" id="playIcon"></i>
+                </button>
+                <span style="font-size: 0.85rem; font-weight: 700; color: var(--rosewood);">Musik Relaksasi</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Audio Element (Instrumen Piano Relaksasi) -->
+    <audio id="bgMusic" loop src="lagu.mp3"></audio>
+
+    <main>
+        <!-- 3. Seksi Galeri Refleksi (2 Foto) -->
+        <section id="galeri">
+            <div class="section-header">
+                <h2>Galeri Ketenangan</h2>
+                <p>Dua sudut pandang hangat untuk menyejukkan hati dan pikiranmu.</p>
+            </div>
+            <div class="photo-gallery">
+                <div class="photo-card">
+                    <div class="photo-wrapper">
+                        <img src="isel2.jpeg" alt="Harapan Baru Hari Esok">
+                    </div>
+                    <div class="photo-caption">
+                        <h3>Fajar & Harapan Baru</h3>
+                        <p>"Badai pasti berlalu. Sebagaimana matahari selalu terbit kembali, selalu ada harapan dan kedamaian baru untukmu besok."</p>
+                    </div>
+                </div>
+                <div class="photo-card">
+                    <div class="photo-wrapper">
+                        <img src="isel1.jpeg" alt="Ketenangan Batin">
+                    </div>
+                    <div class="photo-caption">
+                        <h3>Ketenangan Batin</h3>
+                        <p>"Kamu tidak harus menyelesaikan semua masalah keluarga dalam satu hari. Berilah ruang untuk hatimu beristirahat."</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Seksi 10 Kartu Afirmasi & Apresiasi -->
+        <section id="afirmasi">
+            <div class="section-header">
+                <h2>10 Pelukan Afirmasi & Apresiasi</h2>
+                <p>Sentuh atau ketuk kartu ber-emoticon imut di bawah ini untuk membuka pesan hangat!</p>
+            </div>
+            <div class="cards-grid">
+
+                <!-- Kartu 1 -->
+                <div class="flip-card" onclick="flipCard(this)">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="card-emo-wrapper">🧸💖</div>
+                            <div class="card-front-title">Ketahanan Diri</div>
+                            <span class="card-badge">Buka Pelukan ✨</span>
+                        </div>
+                        <div class="flip-card-back">
+                            <div class="back-title">Kamu Sangat Kuat</div>
+                            <div class="back-text">Terima kasih sudah bertahan sejauh ini meskipun situasi di rumah sedang tidak mudah. Kamu hebat!</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kartu 2 -->
+                <div class="flip-card" onclick="flipCard(this)">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="card-emo-wrapper">😺💤</div>
+                            <div class="card-front-title">Ruang Istirahat</div>
+                            <span class="card-badge">Ketuk Aku 💌</span>
+                        </div>
+                        <div class="flip-card-back">
+                            <div class="back-title">Boleh Lelah</div>
+                            <div class="back-text">Tidak apa-apa untuk merasa lelah dan butuh waktu menyendiri. Napaslah dengan perlahan.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kartu 3 -->
+                <div class="flip-card" onclick="flipCard(this)">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="card-emo-wrapper">☕✨</div>
+                            <div class="card-front-title">Kehangatan Batin</div>
+                            <span class="card-badge">Pelukan Hangat ☕</span>
+                        </div>
+                        <div class="flip-card-back">
+                            <div class="back-title">Sayangi Dirimu</div>
+                            <div class="back-text">Seduh minuman hangat kesukaanmu. Kamu berhak mendapatkan ketenangan di tengah hiruk pikuk.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kartu 4 -->
+                <div class="flip-card" onclick="flipCard(this)">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="card-emo-wrapper">🌟🧁</div>
+                            <div class="card-front-title">Nilai Diri</div>
+                            <span class="card-badge">Buka Pesan 🌟</span>
+                        </div>
+                        <div class="flip-card-back">
+                            <div class="back-title">Kamu Berharga</div>
+                            <div class="back-text">Masalah keluarga tidak menentukan nilai dirimu. Kamu adalah pribadi yang berharga dan dicintai.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kartu 5 -->
+                <div class="flip-card" onclick="flipCard(this)">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="card-emo-wrapper">🐰🌸</div>
+                            <div class="card-front-title">Batasan Diri</div>
+                            <span class="card-badge">Buka Senyum 🌸</span>
+                        </div>
+                        <div class="flip-card-back">
+                            <div class="back-title">Jaga Hati</div>
+                            <div class="back-text">Membuat batasan emosional demi kesehatan mentalmu adalah tindakan yang bijak, bukan egois.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kartu 6 -->
+                <div class="flip-card" onclick="flipCard(this)">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="card-emo-wrapper">🐥🌾</div>
+                            <div class="card-front-title">Proses & Waktu</div>
+                            <span class="card-badge">Buka Harapan 🐥</span>
+                        </div>
+                        <div class="flip-card-back">
+                            <div class="back-title">Semua Butuh Waktu</div>
+                            <div class="back-text">Segala hal yang rumit butuh waktu untuk mengurai. Percayalah pada proses pendewasaan ini.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kartu 7 -->
+                <div class="flip-card" onclick="flipCard(this)">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="card-emo-wrapper">🌻☀️</div>
+                            <div class="card-front-title">Masa Depan</div>
+                            <span class="card-badge">Buka Cahaya 🌻</span>
+                        </div>
+                        <div class="flip-card-back">
+                            <div class="back-title">Hari Baik Datang</div>
+                            <div class="back-text">Hari-hari bahagia dan penuh tawa sedang menunggumu di depan sana. Tetaplah melangkah.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kartu 8 -->
+                <div class="flip-card" onclick="flipCard(this)">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="card-emo-wrapper">🍪🥛</div>
+                            <div class="card-front-title">Apresiasi Usaha</div>
+                            <span class="card-badge">Buka Hadiah 🍪</span>
+                        </div>
+                        <div class="flip-card-back">
+                            <div class="back-title">Bangga Padamu</div>
+                            <div class="back-text">Patut dibanggakan bagaimana kamu tetap memilih berusaha menjadi orang baik hari ini.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kartu 9 -->
+                <div class="flip-card" onclick="flipCard(this)">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="card-emo-wrapper">🐼🎈</div>
+                            <div class="card-front-title">Pelepasan Beban</div>
+                            <span class="card-badge">Lepas Beban 🎈</span>
+                        </div>
+                        <div class="flip-card-back">
+                            <div class="back-title">Bukan Salahmu</div>
+                            <div class="back-text">Ingatlah bahwa konflik orang dewasa bukan tanggung jawab yang harus kamu pikul sendiri.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kartu 10 -->
+                <div class="flip-card" onclick="flipCard(this)">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="card-emo-wrapper">🌈🕊️</div>
+                            <div class="card-front-title">Kedamaian Hati</div>
+                            <span class="card-badge">Buka Kedamaian 🌈</span>
+                        </div>
+                        <div class="flip-card-back">
+                            <div class="back-title">Pelukan Hangat</div>
+                            <div class="back-text">Kamu tidak sendirian. Semesta merangkulmu dengan cinta yang tak terhingga. Kedamaian menyertaimu.</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 5. Seksi Ruang Curhat -->
+        <section id="curhat">
+            <div class="section-header">
+                <h2>Ruang Curhat Rahasia</h2>
+                <p>Tumpahkan apa pun yang mengganjal di hatimu. Tulisan ini aman & hanya tersimpan di perangkatmu.</p>
+            </div>
+            <div class="journal-card">
+                <textarea class="journal-textarea" id="journalInput" placeholder="Tuliskan keluh kesahmu di sini... Keluarkan semuanya..."></textarea>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <button class="btn-save" onclick="saveJournal()">Simpan Catatan Hati</button>
+                    <span id="savedNotice" style="color: var(--pink-deep); font-weight: 700; opacity: 0; transition: opacity 0.3s;">Tersimpan! ❤️</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Audio Player Controls
+        const audio = document.getElementById('bgMusic');
+        const playIcon = document.getElementById('playIcon');
+
+        function enterApp() {
+            document.getElementById('splashScreen').classList.add('fade-out');
+            audio.play().then(() => {
+                playIcon.className = 'fa-solid fa-pause';
+            }).catch(e => console.log("Auto-play dibatasi browser"));
+        }
+
+        function toggleAudio() {
+            if (audio.paused) {
+                audio.play();
+                playIcon.className = 'fa-solid fa-pause';
+            } else {
+                audio.pause();
+                playIcon.className = 'fa-solid fa-play';
+            }
+        }
+
+        // Card Flip Function
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+        }
+
+        // LocalStorage Journal
+        const journalInput = document.getElementById('journalInput');
+        journalInput.value = localStorage.getItem('ruangTenang_journal') || '';
+
+        function saveJournal() {
+            localStorage.setItem('ruangTenang_journal', journalInput.value);
+            const notice = document.getElementById('savedNotice');
+            notice.style.opacity = '1';
+            setTimeout(() => notice.style.opacity = '0', 2500);
+        }
+
+        // Background Particles Effect
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 5 + 2;
+                this.speedY = Math.random() * 0.6 + 0.2;
+                this.opacity = Math.random() * 0.5 + 0.2;
+            }
+            update() {
+                this.y -= this.speedY;
+                if (this.y < 0) {
+                    this.y = canvas.height;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+            draw() {
+                ctx.fillStyle = `rgba(247, 202, 208, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 35; i++) {
+            particles.push(new Particle());
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+    </script>
+</body>
+</html>
